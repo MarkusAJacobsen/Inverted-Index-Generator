@@ -1,6 +1,7 @@
 package invertedindex
 
 import (
+	"fmt"
 	"reflect"
 	"testing"
 )
@@ -92,5 +93,36 @@ func TestTokenize_NoDoc(t *testing.T) {
 
 	if !reflect.DeepEqual(expectedList, actualList) {
 		t.Fatalf("\nExpected:%v \nGot:%v", expectedList, actualList)
+	}
+}
+
+func TestGenerateInvertedIndexWithPreExistingIds(t *testing.T) {
+	input := make(map[int][]string, 0)
+
+	input[1] = []string{"1001", "1002"}
+	input[23] = []string{"1001", "1003"}
+
+	expected := InvertedIndex{
+		HashMap: nil,
+		Items: []*InvertedIndexEntry{{
+			Term:            "1001",
+			Frequency:       2,
+			DocumentListing: []int{1, 23},
+		}, {
+			Term:            "1002",
+			Frequency:       1,
+			DocumentListing: []int{1},
+		}, {
+			Term:            "1003",
+			Frequency:       1,
+			DocumentListing: []int{23},
+		}},
+	}
+
+	actual := GenerateInvertedIndexWithPreExistingIds(input)
+
+	if !reflect.DeepEqual(actual.Items, expected.Items) {
+		fmt.Printf("Expected %+v, actual %+v\n", expected.Items, actual.Items)
+		t.Fail()
 	}
 }

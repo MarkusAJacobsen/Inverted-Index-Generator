@@ -157,6 +157,40 @@ func GenerateInvertedIndex(DocList []string) InvertedIndex {
 	return *invertedIndex
 }
 
+type DocMapWithId struct {
+	Term  string
+	DocId int
+}
+
+type GlobalDocMapWithId struct {
+	Docs []DocMapWithId
+}
+
+func GenerateInvertedIndexWithPreExistingIds(Docs map[int][]string) InvertedIndex {
+	var globalDocMap GlobalDocMapWithId
+
+	for k, v := range Docs {
+		for _, t := range v {
+			docMapWithId := DocMapWithId{
+				Term:  t,
+				DocId: k,
+			}
+
+			globalDocMap.Docs = append(globalDocMap.Docs, docMapWithId)
+		}
+	}
+
+	// Create an empty inverted index
+	invertedIndex := CreateInvertedIndex()
+
+	for _, Doc := range globalDocMap.Docs {
+		invertedIndex.AddItem(Doc.Term, Doc.DocId)
+	}
+
+	fmt.Printf("%+v", *invertedIndex)
+	return *invertedIndex
+}
+
 // Find for a given inverted index and search term
 // checks if the term exists and then
 // outputs the documents the

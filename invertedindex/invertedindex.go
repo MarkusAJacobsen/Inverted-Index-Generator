@@ -86,6 +86,20 @@ func RemoveDuplicates(wordList []string) []string {
 	return uniqueWords
 }
 
+func RemoveDuplicateListings(ids []int) []int {
+	keys := make(map[int]bool)
+	uniqueIds := []int{}
+
+	for _, entry := range ids {
+		if _, value := keys[entry]; !value {
+			keys[entry] = true
+			uniqueIds = append(uniqueIds, entry)
+		}
+	}
+
+	return uniqueIds
+}
+
 // Preprocessing converts each word to lowercase
 // TODO: Clean up each word for symbols
 func Preprocessing(wordList []string) []string {
@@ -187,7 +201,10 @@ func GenerateInvertedIndexWithPreExistingIds(Docs map[int][]string) InvertedInde
 		invertedIndex.AddItem(Doc.Term, Doc.DocId)
 	}
 
-	fmt.Printf("%+v", *invertedIndex)
+	for i := range invertedIndex.Items {
+		invertedIndex.Items[i].DocumentListing = RemoveDuplicateListings(invertedIndex.Items[i].DocumentListing)
+	}
+
 	return *invertedIndex
 }
 
